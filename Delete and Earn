@@ -1,0 +1,15 @@
+freqs = Counter(nums)
+        unique_nums = sorted(list(set(nums)))
+        dp = [0] + [0] * len(unique_nums)
+        dp[1] = unique_nums[0] * freqs[unique_nums[0]]
+        prev = unique_nums[0]
+        for k, num in enumerate(unique_nums[1:], 2):
+            if prev == num - 1:
+                
+                dp[k] = max(dp[k - 1], dp[k - 2] + num * freqs[num])
+            else:
+                
+                dp[k] = dp[k - 1] + num * freqs[num]
+            prev = num
+        return dp[-1]
+© 2021 GitHub, Inc.
