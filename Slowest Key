@@ -1,0 +1,21 @@
+class Solution {
+public:
+    char slowestKey(vector<int>& rt, string kp) {
+         int diff = rt[0], temp;
+        char ans = kp[0];
+        
+        for(int i = 1; i < rt.size(); i++) {
+            temp = rt[i] - rt[i-1];
+            if(temp > diff) {
+                diff = temp;
+                ans = kp[i];
+            }
+            else if(temp == diff) {
+                ans = max(ans, kp[i]);
+            }
+        }
+        
+        return ans;
+    
+    }
+};
