@@ -1,0 +1,28 @@
+class Solution:
+    def _calc(self, s: str, i: int) -> Tuple[int, int]:
+        result: int = 0
+        number: int = 0
+        op: int = 1
+        while i < len(s):
+            c = s[i]
+            if c.isdigit():
+                number = number * 10 + int(c) 
+            elif c != ' ':
+                result += number * op
+                number = 0
+                if c == '+':
+                    op = 1
+                elif c == '-':
+                    op = -1
+                elif c == '(':
+                    number, i = self._calc(s, i + 1)
+                else:
+                    return result, i
+            
+            i += 1
+            
+        return result + number * op, i 
+    
+    def calculate(self, s: str) -> int:
+        result, _ = self._calc(s, 0)
+        return result
