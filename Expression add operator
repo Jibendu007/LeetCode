@@ -1,0 +1,32 @@
+class Solution {
+public:
+    vector<string> ValidExp;
+    void calc(string &num,int index,long last,long result,int &target,string expression)
+    {
+        if(index==num.length())
+        {
+            if(result==target)
+              ValidExp.push_back(expression);
+            return;
+        }
+        for(int i=index;i<num.length();i++)
+        {
+            string subStr=num.substr(index,i-index+1);
+            long val=stol(subStr);
+            calc(num,i+1,val,result+val,target,index==0?expression+subStr:expression+"+"+subStr);
+            if(index!=0)
+            {
+                calc(num,i+1,-1*val,result-val,target,expression+"-"+subStr);
+                calc(num,i+1,last*val,result-last+last*val,target,expression+"*"+subStr);
+            }
+            if(num[index]=='0')
+                break;
+        }
+    }
+    
+    vector<string> addOperators(string num, int target) 
+    {
+        calc(num,0,0,0,target,"");
+        return ValidExp;
+    }
+};
