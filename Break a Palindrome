@@ -1,0 +1,22 @@
+class Solution {
+public:
+    string breakPalindrome(string palindrome) {
+        int length = palindrome.length();
+        if(length == 1){
+            return "";
+        }
+        int left = 0;
+        int right = length - 1;
+        while(left < right){
+            if(palindrome[left] != 'a'){
+                palindrome[left] = 'a';
+                return palindrome;
+            }
+            left++;
+            right--;
+        }
+        char last_char = palindrome[length-1];
+        palindrome[length-1] = ((last_char - 'a') + 1) + 'a';
+        return palindrome;
+    }
+};
