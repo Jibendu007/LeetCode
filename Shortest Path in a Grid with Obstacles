@@ -1,55 +1,87 @@
-class Solution {
-public:
-int shortestPath(vector<vector>& grid, int k) {
+class Comparison
+{
+	int d_m;
+	int d_n;
 
-    int m=grid.size();
-    int n=grid[0].size();
-    
-    vector<vector<int>>dis(m,vector<int>(n,INT_MAX));
-    
-    queue<vector<int>>q;
-    
-    dis[0][0]=grid[0][0];
-    
-    int level=0;
-    
-    int dx[]={-1,1,0,0};
-    int dy[]={0,0,1,-1};
-    
-    q.push({0,0});
-    
-    while(!q.empty()){
-        
-        int sz=q.size();
-        
-        while(sz--){
-            
-            vector<int>vec=q.front();
-            q.pop();
-            
-            if(vec[0]==m-1 && vec[1]==n-1){
-                return level;
-            }
-           
-            for(int i=0;i<4;i++){
+	public:
+		Comparison(int m, int n)
+		:
+			d_m(m),
+			d_n(n)
+		{}
 
-                int x=dx[i]+vec[0];
-                int y=dy[i]+vec[1];
-                
-                if(x>=0 && x<m && y>=0 && y<n && dis[vec[0]][vec[1]]+grid[x][y]<=k && dis[vec[0]][vec[1]]+grid[x][y]<dis[x][y] ){
-                    
-                    dis[x][y]=dis[vec[0]][vec[1]]+grid[x][y];
-                    q.push({x,y});
-                }
-                
-            }
-            
-        }
-        
-        level++;
-    }
-    
-    return -1;
-}
+		// used for keeping an order in terms of travelled distance + remaining (Manhattan) distance 
+		bool operator()(vector<int> const &left, vector<int> const &right)
+		{
+			int pastDistLeft = left[3];
+			int pastDistRight = right[3];
+			int remainingDistLeft = (d_m - left[0]) + (d_n - left[1]);
+			int remainingDistRight = (d_m - right[0]) + (d_n - right[1]);
+
+			// priority_queue keeps highest valued elements on top of the queue,
+			// we want the smallest projected distances on top of the queue -> return left > right instead of left < right
+			return (pastDistLeft + remainingDistLeft) > (pastDistRight + remainingDistRight);
+		}
 };
 
+class Solution 
+{
+	public:
+		int shortestPath(vector<vector<int> > const &grid, int k) 
+		{
+			// store shortest travelled distance for each grid point, maintaining k states for remaining obstacle budget
+			int m = grid.size();
+			int n = grid[0].size();
+			vector<vector<vector<int> > > distances(m, vector<vector<int> >(n, vector<int>(k + 1, -1)));
+
+			// priority queue of next coordinates, coordinate with smallest projected distance is on top of queue
+			// constructing Comparison object with (m, n) size arguments, and passing this as argument to priority_queue constructor
+			// -> allows passing arguments to Comparison object
+			Comparison comparison(m, n);
+			priority_queue<vector<int>, vector<vector<int> >, Comparison> coordinates(comparison);
+
+			// {i, j, currK obstacles removed, distance travelled}
+			coordinates.push({0, 0, 0, 0});
+
+			while (!coordinates.empty())
+			{
+				vector<int> coord = coordinates.top();
+				coordinates.pop();
+				int i = coord[0];
+				int j = coord[1];
+				int currK = coord[2];
+				int distance = coord[3];
+
+				// continue if coordinate is outside of grid
+				if (i < 0 || i >= m || j < 0 || j >= n)
+					continue;
+
+				// check if coorindate has already been visited
+				if (distances[i][j][currK] != -1)
+					continue;
+
+				// increment obstacles removed if obstacle is present at current coordinate
+				int newK = (grid[i][j] == 1) ? currK + 1 : currK;
+
+				// continue if not sufficient obstacle budget
+				if (newK > k)
+					continue;
+
+				// found end point
+				if (i == m - 1 && j == n - 1)
+					return distance;
+
+				// update travelled distance for current coordinate
+				distances[i][j][newK] = distance;
+
+				// iterate next coordinates
+				coordinates.push({i - 1, j, newK, distance + 1});
+				coordinates.push({i + 1, j, newK, distance + 1});
+				coordinates.push({i, j - 1, newK, distance + 1});
+				coordinates.push({i, j + 1, newK, distance + 1});
+			}
+
+			// end point could not be reached, return -1
+			return -1;
+		}
+};
