@@ -1,0 +1,37 @@
+int movesToChessboard(vector<vector<int>>& board) {
+        int n = board.size();
+        int maxR = 0, maxC = 0, ones = 0, zeros = 0;
+        for (int i = 0; i < n; i++) {
+            int rzero = 0, rone = 0, czero = 0, cone = 0;
+            maxR = max(maxR, helper(-1, i, board, rzero, rone, n));
+            if (maxR == INT_MAX) return -1;
+            maxC = max(maxC, helper(i, -1, board, czero, cone, n));
+            if (maxC == INT_MAX) return -1;
+            ones = ones + rone + cone;
+            zeros = zeros + rzero + czero;
+        }
+        if (ones - zeros > 2 || zeros - ones > 2) return -1;
+        return maxR + maxC;
+    }
+    
+    int helper(int r, int c, vector<vector<int>>& board, int& zero, int& one, int n) {
+        zero = 0, one = 0;
+        int oneodd = 0, oneeven = 0;
+        int result = 0;
+        for (int i = 0; i < n; i ++) {
+            int b = r == -1 ? board[i][c] : board[r][i];
+            if (b == 0) {
+                zero++;
+            }
+            else {
+                one++;
+                if (i % 2 == 0) oneeven++;
+                else oneodd++;
+            }
+        }
+        if (one - zero > 1 || zero - one > 1) return INT_MAX;
+        if (one > zero) result = oneodd;
+        else if (one < zero) result = oneeven;
+        else result = min(oneodd, oneeven);
+        return result;
+    }
