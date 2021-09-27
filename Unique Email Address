@@ -1,0 +1,18 @@
+int numUniqueEmails(vector& emails) {
+set s;
+for(auto e : emails)
+{
+string str="";
+for(char ch : e)
+{
+if(ch == '+' || ch == '@')
+break;
+if(ch == '.')
+continue;
+str += ch;
+}
+str += e.substr(e.find('@'));
+s.insert(str);
+}
+return s.size();
+}
