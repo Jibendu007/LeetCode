@@ -1,0 +1,27 @@
+class Solution {
+public:
+    vector<int> sortArrayByParityII(vector<int>& nums) {
+        int n = nums.size();
+        int i = 0, j = n-1;
+        
+        //separate into first half as even and the other half as odd
+        while(i < j) {
+            while(nums[i] & 1)
+                i++;
+            while(nums[j] % 2 == 0)
+                j--;
+            
+            if(i < j)
+                swap(nums[i], nums[j]);
+        }
+        
+        j = n-1;
+        //swap elements with intervals of 2 for the elements which are not in the correct position
+        for(int i = 0; i < j; i += 2) {
+            swap(nums[i], nums[j]);
+            j -= 2;
+        }
+       
+        return nums;
+    }
+};
