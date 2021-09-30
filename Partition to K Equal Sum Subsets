@@ -1,0 +1,34 @@
+class Solution {
+public:
+
+bool search(vector<int>& nums, vector<bool>& visited,int currSum, int reqSum, int i, int k){
+    if(k == 1) return true;
+    
+    if(currSum == reqSum){
+        return search(nums, visited, 0, reqSum, 0, k - 1);
+    }
+    
+    for(auto j = i; j < nums.size(); j++){
+        if(visited[j] || currSum > reqSum) continue;
+        
+        visited[j] = true;
+        if(search(nums, visited, currSum + nums[j], reqSum, j+1, k)) return true;
+        visited[j] = false;
+    }
+    return false;
+}
+bool canPartitionKSubsets(vector<int>& nums, int k) {
+    int sum = 0;
+    for(auto x:nums){
+        sum += x;    
+    }
+    if(nums.size() < k || sum % k != 0) return false;
+    
+    int reqSum = sum / k, n = nums.size();
+    sort(nums.rbegin(), nums.rend());
+    vector<bool> visited(n, false);
+    return search(nums, visited, 0, reqSum, 0, k);
+    
+    
+}
+};
